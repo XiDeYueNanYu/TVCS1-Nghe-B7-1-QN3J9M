@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Thêm viewport để tối ưu hóa di động -->
+    <title>越南语听力练习</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding-bottom: 300px; /* Mặc định cho màn hình lớn */
+            background-color: #f7fbf3; /*f7fbf3  3f4040*/
+        }
+        #gameContainer {
+            display: block;
+            min-height: calc(100vh - 150px); /* Đảm bảo nội dung chiếm đủ chiều cao màn hình */
+        }
+        #infoBox { 
+            width: 95%; 
+            max-width: 700px;
+            min-height: 100px; 
+            margin: 0 auto; 
+            border: 2px solid #91b66f; /*041b31 1f4263*/
+            background: #85ae5f; /*ecf2e4 fefefc*/
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: clamp(40px, 5vw, 60px);
+            font-weight: bold;
+        }
+        #contactBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 2px solid #91b66f; 
+            background: #85ae5f; 
+            color: #f1c232; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #instructionBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 2px solid #91b66f; 
+            background: #85ae5f; 
+            color: #f7e19c; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #controls { 
+            position: fixed; /* Cố định ở cuối màn hình */
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 800px; /* Giới hạn chiều rộng tối đa */
+            background: #f7fbf3;
+                        border: 3px solid #f7fbf3;                        
+            padding: 10px 0; 
+           /* box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); */
+            z-index: 1000; 
+        }
+        #controls div {
+            margin: 5px 0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        button { 
+            padding: 8px 8px; 
+            margin: 0 5px; 
+            cursor: pointer; 
+            border: 2px solid #85ae5f; 
+            background: #85ae5f; /*192332*/
+                        box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+            color: #fffbef; 
+            font-size: 28px; 
+            border-radius: 5px; 
+        }
+        #sentenceNumber { 
+            width: 50px; 
+            padding: 10px; 
+            text-align: center; 
+            border: 3px solid #85ae5f; /*041b31 68838B*/
+            background: #f1cc76; 
+            color: #000; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            -moz-appearance: textfield; 
+        }
+        #sentenceNumber::-webkit-inner-spin-button, 
+        #sentenceNumber::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        #sentenceNumber:disabled { 
+            background: #eee; 
+        }
+        .disabled { 
+            cursor: not-allowed; 
+            pointer-events: none; 
+        }
+        .active-mode { 
+            border: 2px solid #fed16a; 
+        }
+        #indicator { 
+            width: 95%;
+                        max-width: 700px; 
+            min-height: 50px; 
+            margin: 10px auto; 
+                        padding: 5px;
+            border: 3px solid #fed16a; 
+            background: #ffffe0; 
+            border-radius: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        #optionsContainer {
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto;
+        }
+        .optionBtn {
+            width: 95%; 
+            max-width: 700px;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid #ffffff;
+            background: #ffffff; /*E6EDD9*/
+            color: #000000;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 30px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .optionBtn:hover {
+            background: #D2E4C4;
+        }
+        .correct {
+            background: #B7D7AA !important;
+        }
+        .wrong {
+            background: #CE6D5E !important;
+        }
+        #score { 
+            display: none; 
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto; 
+            color: #FF6820; 
+            font-size: 30px; 
+            text-align: center;
+        }
+        #wrongSentences { 
+            display: none; 
+            width: 95%; 
+            max-width: 700px; 
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #CE6D5E; 
+            background: #FFF0F0; 
+            color: #CE6D5E; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+        }
+        #results { 
+            display: none; 
+            width: 95%;
+            max-width: 700px;        
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #734A2E; 
+            background: #fffbef; 
+            color: #000; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+            white-space: pre-line;
+        }
+
+        /* Media query cho thiết bị di động */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 200px; /* Giảm padding-bottom cho điện thoại */
+            }
+            #controls {
+                padding: 5px 0; /* Giảm padding */
+            }
+            button {
+                padding: 6px 6px; /* Giảm kích thước nút */
+                font-size: 20px; /* Giảm kích thước chữ */
+            }
+            #sentenceNumber {
+                width: 40px; /* Giảm chiều rộng */
+                padding: 8px; /* Giảm padding */
+                font-size: 14px; /* Giảm kích thước chữ */
+            }
+            .optionBtn {
+                font-size: 20px; /* Giảm kích thước chữ cho đáp án */
+                padding: 8px; /* Giảm padding */
+            }
+            #infoBox {
+                font-size: clamp(30px, 4vw, 40px); /* Giảm kích thước chữ */
+            }
+            #contactBox, #instructionBox {
+                font-size: clamp(14px, 2vw, 16px); /* Giảm kích thước chữ */
+            }
+            #indicator {
+                min-height: 40px; /* Giảm chiều cao tối thiểu */
+            }
+            #results, #wrongSentences, #score {
+                font-size: 24px; /* Giảm kích thước chữ */
+                                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="infoBox">习得越南语<br>听力练习</div>
+        <div id="contactBox">讲师-阮玉煌 | Weixin：XiDeYueNanYu</div>
+        <div id="instructionBox">选择与播放内容相符的选项</div>
+        <div id="indicator"></div>
+        <div id="optionsContainer"></div>
+        <div id="results"></div>
+        <div id="score">0/0</div>
+        <div id="wrongSentences"></div>
+    </div>
+    <div id="controls">
+        <div>
+            <button id="freeModeBtn" class="active-mode">自由模式</button>
+            <button id="testModeBtn">作业模式</button>
+        </div>
+        <div>
+            <button id="autoContinueBtn">自动继续</button>
+            <button id="showHideBtn">显示-隐藏</button>
+        </div>
+        <div>
+            <button id="prevBtn">◀</button>
+            <input type="text" id="sentenceNumber" inputmode="numeric" pattern="[0-9]*">
+            <button id="nextBtn">▶</button>
+            <button id="replayBtn">再听一遍</button>
+        </div>
+    </div>
+    <audio id="mainAudio" src="audio.mp3"></audio>
+    <audio id="correctAudio" src="Dung.mp3"></audio>
+    <audio id="wrongAudio" src="Sai.mp3"></audio>
+
+    <script>
+        const audio = document.getElementById('mainAudio');
+        const correctAudio = document.getElementById('correctAudio');
+        const wrongAudio = document.getElementById('wrongAudio');
+        const indicator = document.getElementById('indicator');
+        const sentenceNumber = document.getElementById('sentenceNumber');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const replayBtn = document.getElementById('replayBtn');
+        const freeModeBtn = document.getElementById('freeModeBtn');
+        const testModeBtn = document.getElementById('testModeBtn');
+        const autoContinueBtn = document.getElementById('autoContinueBtn');
+        const showHideBtn = document.getElementById('showHideBtn');
+        const scoreDisplay = document.getElementById('score');
+        const wrongSentencesDisplay = document.getElementById('wrongSentences');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const resultsDisplay = document.getElementById('results');
+
+        const buttons = [prevBtn, nextBtn, replayBtn, freeModeBtn, testModeBtn, autoContinueBtn, showHideBtn];
+
+const sentences = [
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.432458,
+        "end": 1.742458,
+        "correctAnswer": "Bạn làm gì đấy?",
+        "translation": "你在做什么？",
+        "options": [
+            "Ban làm gì đấy?",
+            "Bạn làm dì đấy?",
+            "Bạn làm gì dây?",
+            "Bạn làm gì đấy?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 2.422458,
+        "end": 3.732458,
+        "correctAnswer": "Mình ăn chuối.",
+        "translation": "我在吃香蕉。",
+        "options": [
+            "Mình ăm chuối.",
+            "Mình ăn chối.",
+            "Mình ăn chuối.",
+            "Minh ăn chuối."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 4.352458,
+        "end": 5.732458,
+        "correctAnswer": "Ông ấy làm gì đấy?",
+        "translation": "他在做什么？",
+        "options": [
+            "Ông ấy làm gi đấy?",
+            "Ông ấy lam gì đấy?",
+            "Ông ẩy làm gì đấy?",
+            "Ông ấy làm gì đấy?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 6.422458,
+        "end": 7.992458,
+        "correctAnswer": "Ông ấy uống trà.",
+        "translation": "他在喝茶。",
+        "options": [
+            "Ông ấy uống chà.",
+            "Ông ấy uống trả.",
+            "Ông ấy uống trà.",
+            "Ôn ấy uống trà."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 8.562458,
+        "end": 10.512458,
+        "correctAnswer": "Anh ấy ngủ có phải không?",
+        "translation": "他在睡觉，对吗？",
+        "options": [
+            "Anh ấy ngủ có phai không?",
+            "Anh ấy ngủ có phải khong?",
+            "Anh ấy ngủ co phải không?",
+            "Anh ấy ngủ có phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 11.182458,
+        "end": 13.012458,
+        "correctAnswer": "Đúng, anh ấy ngủ.",
+        "translation": "对，他在睡觉。",
+        "options": [
+            "Đúng, anh ấy ngũ.",
+            "Đúng, ảnh ấy ngủ.",
+            "Đúng, anh ấy ngủ.",
+            "Dúng, anh ấy ngủ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 13.582458,
+        "end": 15.132458,
+        "correctAnswer": "Chị ấy có dậy không?",
+        "translation": "她起床了吗？",
+        "options": [
+            "Chị ấy có dày không?",
+            "Chị ấy có dây không?",
+            "Chị ấy có dậy khong?",
+            "Chị ấy có dậy không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 15.882458,
+        "end": 18.262458,
+        "correctAnswer": "Không, chị ấy không dậy.",
+        "translation": "没有，她没有起床。",
+        "options": [
+            "Không, chị ấy không dây.",
+            "Không, chị ẩy không dậy.",
+            "Khong, chị ấy không dậy.",
+            "Không, chị ấy không dậy."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 19.182458,
+        "end": 20.482458,
+        "correctAnswer": "Anh ấy làm gì đấy.",
+        "translation": "他在做什么。",
+        "options": [
+            "Anh ấy làm gì đẩy.",
+            "Anh ấy làm gì đới.",
+            "Anh ấy làm gì đấy.",
+            "Anh ấy lam gì đới."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 21.072458,
+        "end": 22.742458,
+        "correctAnswer": "Anh ấy làm việc.",
+        "translation": "他在工作。",
+        "options": [
+            "Anh ấy làm việt.",
+            "Anh ấy làm viếc.",
+            "Anh ấy làm việc.",
+            "Anh ẩy làm việc."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 23.352458,
+        "end": 24.852458,
+        "correctAnswer": "Anh ấy có nghỉ không?",
+        "translation": "他有休息吗？",
+        "options": [
+            "Anh ấy có nghỉ khong?",
+            "Anh ấy có nghỉ không?",
+            "Anh ấy có ngỉ không?",
+            "Anh ấy co nghỉ không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 25.682458,
+        "end": 27.902458,
+        "correctAnswer": "Có, anh ấy nghỉ.",
+        "translation": "有的，他在休息。",
+        "options": [
+            "Có, anh ấy nghỉ.",
+            "Có, ảnh ấy nghỉ.",
+            "Cỏ, anh ấy nghỉ.",
+            "Có, anh ẩy nghỉ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 28.572458,
+        "end": 30.692458,
+        "correctAnswer": "Thầy ấy có dạy tiếng Trung không?",
+        "translation": "老师教中文吗？",
+        "options": [
+            "Thầy ấy có dạy tiếng Trung khong?",
+            "Thầy ấy có dạy tiếng Trung không?",
+            "Thầy ấy có dạy tiềng Trung không?",
+            "Thầy ấy có dạy tiếng Chung không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 31.822458,
+        "end": 35.042458,
+        "correctAnswer": "Có, thầy ấy có dạy tiếng Trung.",
+        "translation": "是的，老师教中文。",
+        "options": [
+            "Có, thầy ấy có dạy tiếng Trung.",
+            "Có, thầy ẩy có dạy tiếng Trung.",
+            "Có, thầy ấy có dạy tiềng Trung.",
+            "Cỏ, thầy ấy có dạy tiếng Trung."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 35.912458,
+        "end": 37.802458,
+        "correctAnswer": "Anh ấy có học tiếng Việt không?",
+        "translation": "他学越南语吗？",
+        "options": [
+            "Anh ấy có học tiếng Việt không?",
+            "Anh ấy có học tiếng Viết không?",
+            "Anh ẩy có học tiếng Việt không?",
+            "Anh ấy có hộc tiếng Việt không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 38.762458,
+        "end": 41.892458,
+        "correctAnswer": "Có, anh ấy có học tiếng Việt.",
+        "translation": "是的，他学越南语。",
+        "options": [
+            "Có, anh ấy có học tiếng Việt.",
+            "Có, anh ấy có học tiếng Viết.",
+            "Cỏ, anh ấy có học tiếng Việt.",
+            "Có, ảnh ấy có học tiếng Việt."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 42.582458,
+        "end": 44.862458,
+        "correctAnswer": "Bà ấy nói tiếng Nga phải không?",
+        "translation": "她说俄语，对吗？",
+        "options": [
+            "Bà ấy nói tiếng Nga phải khong?",
+            "Bà ấy nói tiếng Nga phải không?",
+            "Bà ấy nói tiếng Nha phải không?",
+            "Bà ẩy nói tiếng Nga phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 45.662458,
+        "end": 51.152458,
+        "correctAnswer": "Không, bà ấy không nói tiếng Nga, bà ấy nói tiếng Trung.",
+        "translation": "不，她不说俄语，她说中文。",
+        "options": [
+            "Không, bà ấy không nói tiếng Nga, bà ấy nói tiếng Trung.",
+            "Không, bà ấy không nói tiếng Nga, bà ấy nói tiếng Chung.",
+            "Khong, bà ấy không nói tiếng Nga, bà ấy nói tiếng Trung.",
+            "Không, bà ẩy không nói tiếng Nga, bà ấy nói tiếng Trung."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 51.912458,
+        "end": 53.402458,
+        "correctAnswer": "Em ấy làm gì đấy?",
+        "translation": "他/她在做什么？",
+        "options": [
+            "Em ấy làm gi đấy?",
+            "Em ấy làm gì dây?",
+            "Em ấy làm gì đấy?",
+            "Em ẩy làm gì đấy?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 54.052458,
+        "end": 55.652458,
+        "correctAnswer": "Em ấy nghe nhạc.",
+        "translation": "他/她在听音乐。",
+        "options": [
+            "Em ấy nghe nhạc.",
+            "Em ấy nghê nhạc.",
+            "Em ấy nghe nhạt.",
+            "Em ẩy nghe nhạc."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 56.432458,
+        "end": 58.642458,
+        "correctAnswer": "Có phải bạn đọc tiếng Việt không?",
+        "translation": "你是不是在读越南语？",
+        "options": [
+            "Có phải bạn dọc tiếng Việt không?",
+            "Có phải bạn đọc tiếng Việt khong?",
+            "Có phải bạn đọc tiếng Việt không?",
+            "Cỏ phải bạn đọc tiếng Việt không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 59.692458,
+        "end": 62.312458,
+        "correctAnswer": "Đúng, tớ đọc tiếng Việt.",
+        "translation": "对，我在读越南语。",
+        "options": [
+            "Đúng, tớ đọc tiếng Việt.",
+            "Đúng, tớ dọc tiếng Việt.",
+            "Dúng, tớ đọc tiếng Việt.",
+            "Đúng, tở đọc tiếng Việt."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 62.922458,
+        "end": 64.512458,
+        "correctAnswer": "Bạn ấy làm gì đấy?",
+        "translation": "他/她在做什么？",
+        "options": [
+            "Bạn ấy làm gì đấy?",
+            "Bạn ấy lam gì đấy?",
+            "Ban ấy làm gì đấy?",
+            "Bạn ẩy làm gì đấy?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 65.272458,
+        "end": 67.102458,
+        "correctAnswer": "Bạn ấy viết thư.",
+        "translation": "他/她在写信。",
+        "options": [
+            "Bạn ấy viết thư.",
+            "Bạn ấy viếc thư.",
+            "Bạn ấy viết thưa.",
+            "Bạn ẩy viết thư."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 67.872458,
+        "end": 69.192458,
+        "correctAnswer": "Anh làm gì đấy?",
+        "translation": "你在做什么？（对男性称呼）",
+        "options": [
+            "Anh làm gì đấy?",
+            "Anh lam gì đấy?",
+            "Anh làm gi đấy?",
+            "Anh làm gì dây?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 70.622458,
+        "end": 72.232458,
+        "correctAnswer": "Tôi xem ti vi.",
+        "translation": "我在看电视。",
+        "options": [
+            "Tôi xêm ti vi.",
+            "Tôi sem ti vi.",
+            "Tôi xem ti vi.",
+            "Tôi xem tì vi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 73.062458,
+        "end": 74.442458,
+        "correctAnswer": "Cậu làm gì đấy?",
+        "translation": "你在做什么？（对朋友称呼）",
+        "options": [
+            "Cậu làm gì đấy?",
+            "Cậu lam gì đấy?",
+            "Cậu làm gi đấy?",
+            "Cậu làm gì dây?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 75.542458,
+        "end": 76.912458,
+        "correctAnswer": "Tớ gọi điện thoại.",
+        "translation": "我在打电话。",
+        "options": [
+            "Tớ gọi điện thoại.",
+            "Tớ gọi điển thoại.",
+            "Tớ gọi diện thoại.",
+            "Tớ gỏi điện thoại."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 77.902458,
+        "end": 79.252458,
+        "correctAnswer": "Chị làm gì đấy?",
+        "translation": "姐姐，你在做什么？",
+        "options": [
+            "Chị làm gì đấy?",
+            "Chị làm gì đẩy?",
+            "Chị làm gì đấyh?",
+            "Chị làm dì đấy?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 81.302458,
+        "end": 82.862458,
+        "correctAnswer": "Chị hỏi thầy giáo.",
+        "translation": "姐姐问老师。",
+        "options": [
+            "Chị hỏi thầy giáo.",
+            "Chị hỏi thay giáo.",
+            "Chị hỏi thầy giảo.",
+            "Chị hởi thầy giáo."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 83.612458,
+        "end": 85.212458,
+        "correctAnswer": "Cô làm gì đấy?",
+        "translation": "阿姨，你在做什么？",
+        "options": [
+            "Cô làm dì đấy?",
+            "Cô làm gì đẩy?",
+            "Cô làm gì đấy?",
+            "Cô làm gì đáy?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 86.312458,
+        "end": 88.332458,
+        "correctAnswer": "Cô trả lời học sinh.",
+        "translation": "阿姨回答学生。",
+        "options": [
+            "Cô trả lời học sinh.",
+            "Cô trả lòi học sinh.",
+            "Cô trả lời học xinh.",
+            "Cô chả lời học sinh."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 88.982458,
+        "end": 90.602458,
+        "correctAnswer": "Anh uống cà phê không?",
+        "translation": "你喝咖啡吗？",
+        "options": [
+            "Anh uống cà phê khong?",
+            "Anh uống gà phê không?",
+            "Anh uống cà phê không?",
+            "Anh uống cà phe không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 91.702458,
+        "end": 94.412458,
+        "correctAnswer": "Không, tôi không uống cà phê.",
+        "translation": "不，我不喝咖啡。",
+        "options": [
+            "Không, tôi không uống cà phê.",
+            "Không, tôi khong uống cà phê.",
+            "Không, tôi không uống cà phe.",
+            "Khong, tôi không uống cà phê."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 95.042458,
+        "end": 96.682458,
+        "correctAnswer": "Em uống bia không?",
+        "translation": "你喝啤酒吗？",
+        "options": [
+            "Em uống bìa không?",
+            "Em uống bia khong?",
+            "Em uống bia không?",
+            "Em uống pịa không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 97.772458,
+        "end": 99.882458,
+        "correctAnswer": "Có, em uống bia.",
+        "translation": "是的，我喝啤酒。",
+        "options": [
+            "Có, em uống bịa.",
+            "Có, em uống bia.",
+            "Có, em uổng bia.",
+            "Có, em uống pía."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 100.442458,
+        "end": 102.222458,
+        "correctAnswer": "Bạn có xem ti vi không?",
+        "translation": "你看电视吗？",
+        "options": [
+            "Bạn có xem ti vi không?",
+            "Bạn cố xem ti vi không?",
+            "Bạn có sem ti vi không?",
+            "Bạn có xem ti vị không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 103.222458,
+        "end": 107.542458,
+        "correctAnswer": "Không, mình không xem ti vi, mình đọc báo.",
+        "translation": "不，我不看电视，我看报纸。",
+        "options": [
+            "Không, mình không xem ti vi, mình đọc bão.",
+            "Khong, mình không xem ti vi, mình đọc báo.",
+            "Không, mình không sem ti vi, mình đọc báo.",
+            "Không, mình không xem ti vi, mình đọc báo."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 109.122458,
+        "end": 110.722458,
+        "correctAnswer": "Mình sẽ học tiếng Việt.",
+        "translation": "我将学习越南语。",
+        "options": [
+            "Mình sẽ học tiếng Việt.",
+            "Mình sẽ hộc tiếng Việt.",
+            "Mình sẽ học tiếc Việt.",
+            "Mình sẽ mọc tiếng Việt."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 111.872458,
+        "end": 113.962458,
+        "correctAnswer": "Tớ sẽ đọc cuốn sách ấy.",
+        "translation": "我会读那本书。",
+        "options": [
+            "Tớ sẽ đọc cuốn sách ấy.",
+            "Tớ sẽ đọc cuốn sánh ấy.",
+            "Tớ sẽ đọc cuốn sách ẩy.",
+            "Tớ sẽ đoc cuốn sách ấy."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 114.852458,
+        "end": 116.582458,
+        "correctAnswer": "Tôi sẽ đọc tiếng Việt.",
+        "translation": "我会读越南语。",
+        "options": [
+            "Tôi sẽ đọc tiếng Việt.",
+            "Tôi sẽ đọc tiếng Viết.",
+            "Tôi sẽ dọc tiếng Việt.",
+            "Tôi sẽ đọc tiếc Việt."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 117.742458,
+        "end": 119.402458,
+        "correctAnswer": "Tôi ngủ ở nhà.",
+        "translation": "我在家睡觉。",
+        "options": [
+            "Tôi ngủ ở nhá.",
+            "Tôi ngủ ở nhà.",
+            "Tôi ngủ ở nhã.",
+            "Tôi ngũ ở nhà."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 119.992458,
+        "end": 122.302458,
+        "correctAnswer": "Tôi xem ti vi ở nhà.",
+        "translation": "我在家看电视。",
+        "options": [
+            "Tôi xem ti vi ở nhà.",
+            "Tôi sem ti vi ở nhà.",
+            "Tôi xem ti vị ở nhà.",
+            "Tôi xem ti vi ở nhã."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 122.872458,
+        "end": 125.462458,
+        "correctAnswer": "Anh ấy đọc báo ở công ty.",
+        "translation": "他在公司看报纸。",
+        "options": [
+            "Anh ấy đọc báo ở công ty.",
+            "Anh ấy dọc báo ở công ty.",
+            "Anh ấy đọc bão ở công ty.",
+            "Anh ấy đọc báo ở công tỳ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 126.272458,
+        "end": 129.072458,
+        "correctAnswer": "Chị ấy học tiếng Trung tại trường đại học.",
+        "translation": "她在大学学中文。",
+        "options": [
+            "Chị ấy học tiếng Trung tại trường đại học.",
+            "Chị ấy học tiếng Trung tại trường đài học.",
+            "Chị ấy học tiếng Trung tại trường đại hộc.",
+            "Chị ấy học tiếng Trung tại trưởng đại học."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 129.682458,
+        "end": 132.882458,
+        "correctAnswer": "Bà ấy uống cà phê ở quán cà phê.",
+        "translation": "她在咖啡馆喝咖啡。",
+        "options": [
+            "Bà ấy uống cà phê ở quán cà phê.",
+            "Bà ấy uống cà phe ở quán cà phê.",
+            "Bà ấy uổng cà phê ở quán cà phê.",
+            "Bà ấy uống cà phê ở quáng cà phê."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 133.442458,
+        "end": 135.872458,
+        "correctAnswer": "Thầy giáo chữa bài tập tại lớp.",
+        "translation": "老师在课堂上改作业。",
+        "options": [
+            "Thầy giáo chữa bài tập tại lớp.",
+            "Thầy giáo chữa bải tập tại lớp.",
+            "Thầy giáo chửa bài tập tại lớp.",
+            "Thầy giáo chữa bài tạp tại lớp."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 136.462458,
+        "end": 139.012458,
+        "correctAnswer": "Tôi sẽ rút tiền tại ngân hàng.",
+        "translation": "我会在银行取钱。",
+        "options": [
+            "Tôi sẽ rút tiền tại ngân hàng.",
+            "Tôi sẽ rút tiên tại ngân hàng.",
+            "Tôi sẽ rúc tiền tại ngân hàng.",
+            "Tôi sẽ rút tiền tại ngâng hàng."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 139.602458,
+        "end": 141.882458,
+        "correctAnswer": "Tôi sẽ gửi thư tại bưu điện.",
+        "translation": "我会在邮局寄信。",
+        "options": [
+            "Tôi sẽ gửi thư tại bưu điện.",
+            "Tôi sẽ gửi thư tại bưu điển.",
+            "Tôi sẽ gởi thư tại bưu điện.",
+            "Tôi sẽ gửi thưa tại bưu điện."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 142.492458,
+        "end": 144.862458,
+        "correctAnswer": "Tôi sẽ mua hàng ở siêu thị.",
+        "translation": "我会在超市买东西。",
+        "options": [
+            "Tôi sẽ mua hàng ở siêu thị.",
+            "Tôi sẽ mua hàng ở siu thị.",
+            "Tôi sẽ muạ hàng ở siêu thị.",
+            "Tôi sẽ mua hàng ở siêu thí."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 145.502458,
+        "end": 147.982458,
+        "correctAnswer": "Tôi sẽ mua thuốc ở bệnh viện.",
+        "translation": "我会在医院买药。",
+        "options": [
+            "Tôi sẽ mua thuốc ở bệnh viện.",
+            "Tôi sẽ mua thuốt ở bệnh viện.",
+            "Tôi sẽ mua thuốc ở bện viện.",
+            "Tôi sẽ mua thuốc ở bệnh viễn."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 148.682458,
+        "end": 151.322458,
+        "correctAnswer": "Tôi sẽ mua từ điển ở nhà sách.",
+        "translation": "我会在书店买词典。",
+        "options": [
+            "Tôi sẽ mua từ điển ở nhà sách.",
+            "Tôi sẽ mua từ điển ở nha sách.",
+            "Tôi sẽ mua từ điện ở nhà sách.",
+            "Tôi sẽ mua từ điển ở nhạ sách."
+        ]
+    }
+];
+
+        let currentIndex = 0;
+        let isFreeMode = true;
+        let correctCount = 0;
+        let isPlaying = false;
+        let correctSentences = new Set();
+        let wrongSentences = new Set();
+        let autoContinue = false;
+        let showAnswer = false;
+        let userAnswers = [];
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function init() {
+            updateSentenceDisplay();
+        }
+
+        function updateSentenceDisplay() {
+            sentenceNumber.value = currentIndex + 1;
+            indicator.style.background = '#ffffe0';
+            if (isFreeMode && showAnswer) {
+                indicator.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; color: #85ae5f;">${sentences[currentIndex].translation}</div>
+                `;
+            } else {
+                indicator.innerHTML = '';
+            }
+            updateOptions();
+            if (!isFreeMode) updateScore();
+        }
+
+        function updateOptions() {
+            optionsContainer.innerHTML = '';
+            const shuffledOptions = shuffleArray(sentences[currentIndex].options);
+            shuffledOptions.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'optionBtn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function playCurrentSentence() {
+            if (isPlaying) audio.pause();
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            sentenceNumber.disabled = true;
+            isPlaying = true;
+            audio.src = sentences[currentIndex].audioFile;
+            audio.currentTime = sentences[currentIndex].start;
+            audio.play().catch(error => {
+                console.error('Audio playback failed:', error);
+                alert('Vui lòng nhấn nút “再听一遍” để phát âm thanh.');
+                buttons.forEach(btn => btn.classList.remove('disabled'));
+                sentenceNumber.disabled = false;
+                isPlaying = false;
+            });
+
+            audio.ontimeupdate = () => {
+                if (audio.currentTime >= sentences[currentIndex].end) {
+                    audio.pause();
+                    audio.ontimeupdate = null;
+                    buttons.forEach(btn => btn.classList.remove('disabled'));
+                    sentenceNumber.disabled = false;
+                    isPlaying = false;
+                }
+            };
+        }
+
+        function moveSentence(direction) {
+            currentIndex = (currentIndex + direction + sentences.length) % sentences.length;
+            updateSentenceDisplay();
+            playCurrentSentence();
+        }
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = sentences[currentIndex].correctAnswer;
+            const optionButtons = optionsContainer.getElementsByClassName('optionBtn');
+            
+            // Clear previous styles
+            for (let btn of optionButtons) {
+                btn.classList.remove('correct', 'wrong');
+                btn.disabled = !isFreeMode; // Only disable buttons in Test Mode
+            }
+
+            // Find and style the selected button
+            for (let btn of optionButtons) {
+                if (btn.textContent === selectedAnswer) {
+                    if (selectedAnswer === correctAnswer) {
+                        indicator.style.background = '#B7D7AA';
+                                                indicator.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; color: #000000;">${sentences[currentIndex].translation}</div>
+                `;
+                        btn.classList.add('correct');
+                        correctAudio.play().catch(error => {
+                            console.error('Correct audio playback failed:', error);
+                        });
+                    } else {
+                        indicator.style.background = '#CE6D5E';
+                                                indicator.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; color: #000000;">${sentences[currentIndex].translation}</div>
+                `;
+                        btn.classList.add('wrong');
+                        wrongAudio.play().catch(error => {
+                            console.error('Wrong audio playback failed:', error);
+                        });
+                    }
+                }
+            }
+
+            if (!isFreeMode) {
+                userAnswers[currentIndex] = selectedAnswer;
+                if (selectedAnswer === correctAnswer && !correctSentences.has(currentIndex)) {
+                    correctCount++;
+                    correctSentences.add(currentIndex);
+                    wrongSentences.delete(currentIndex);
+                } else if (selectedAnswer !== correctAnswer && !correctSentences.has(currentIndex)) {
+                    wrongSentences.add(currentIndex);
+                }
+                updateScore();
+
+                // Auto-move to next sentence in Test Mode
+                const audioToWait = (selectedAnswer === correctAnswer) ? correctAudio : wrongAudio;
+                audioToWait.onended = () => {
+                    if (userAnswers.length === sentences.length) {
+                        showResults();
+                    } else {
+                        setTimeout(() => {
+                            moveSentence(1);
+                        }, 200);
+                    }
+                };
+            } else if (isFreeMode && autoContinue && selectedAnswer === correctAnswer) {
+                // Auto-move in Free Mode only if answer is correct and autoContinue is enabled
+                correctAudio.onended = () => {
+                    setTimeout(() => {
+                        moveSentence(1);
+                    }, 200);
+                };
+            } else {
+                correctAudio.onended = null;
+                wrongAudio.onended = null;
+            }
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `${correctCount}/${sentences.length}`;
+            scoreDisplay.style.display = 'block'; // Hiển thị score trong Test Mode
+        }
+
+        function showResults() {
+            let resultText = `练习完成！\n正确答案数量：${correctCount}/${sentences.length}\n正确率：${((correctCount / sentences.length) * 100).toFixed(2)}%\n错误题目：`;
+            wrongSentences.forEach(index => {
+                resultText += `\n第${index + 1}题：\n你的选择：${userAnswers[index] || '未选择'}\n正确答案：${sentences[index].correctAnswer}\n`;
+            });
+            if (wrongSentences.size === 0) {
+                resultText += '\n全部正确！';
+            }
+            resultsDisplay.textContent = resultText;
+            resultsDisplay.style.display = 'block';
+        }
+
+        prevBtn.onclick = () => {
+            moveSentence(-1);
+        };
+
+        nextBtn.onclick = () => {
+            moveSentence(1);
+        };
+
+        replayBtn.onclick = () => {
+            playCurrentSentence();
+        };
+
+        freeModeBtn.onclick = () => {
+            isFreeMode = true;
+            freeModeBtn.classList.add('active-mode');
+            testModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = false;
+            autoContinueBtn.classList.remove('disabled');
+            showHideBtn.disabled = false;
+            showHideBtn.classList.remove('disabled');
+            scoreDisplay.style.display = 'none';
+            wrongSentencesDisplay.style.display = 'none';
+            resultsDisplay.style.display = 'none';
+            updateSentenceDisplay();
+        };
+
+        testModeBtn.onclick = () => {
+            isFreeMode = false;
+            testModeBtn.classList.add('active-mode');
+            freeModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = true;
+            autoContinueBtn.classList.add('disabled');
+            showHideBtn.disabled = true;
+            showHideBtn.classList.add('disabled');
+            showHideBtn.classList.remove('active-mode');
+            showAnswer = false;
+            scoreDisplay.style.display = 'block';
+            currentIndex = 0;
+            correctCount = 0;
+            correctSentences.clear();
+            wrongSentences.clear();
+            userAnswers = [];
+            for (let i = 0; i < sentences.length; i++) {
+                wrongSentences.add(i);
+            }
+            updateSentenceDisplay();
+        };
+
+        autoContinueBtn.onclick = () => {
+            if (isFreeMode) {
+                autoContinue = !autoContinue;
+                autoContinueBtn.classList.toggle('active-mode');
+                if (!autoContinue) {
+                    correctAudio.onended = null;
+                }
+            }
+        };
+
+        showHideBtn.onclick = () => {
+            if (isFreeMode) {
+                showAnswer = !showAnswer;
+                showHideBtn.classList.toggle('active-mode');
+                updateSentenceDisplay();
+            }
+        };
+
+        sentenceNumber.onchange = () => {
+            if (!isPlaying) {
+                const num = parseInt(sentenceNumber.value) - 1;
+                if (!isNaN(num) && num >= 0 && num < sentences.length) {
+                    currentIndex = num;
+                    updateSentenceDisplay();
+                    playCurrentSentence();
+                } else {
+                    alert(`输入范围： 1 到 ${sentences.length}`);
+                    updateSentenceDisplay();
+                }
+            }
+        };
+
+        sentenceNumber.onkeydown = (e) => {
+            if (!isPlaying) {
+                if (e.key === 'ArrowLeft') {
+                    moveSentence(-1);
+                }
+                if (e.key === 'ArrowRight') {
+                    moveSentence(1);
+                }
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
